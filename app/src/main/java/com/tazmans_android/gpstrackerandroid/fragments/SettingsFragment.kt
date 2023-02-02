@@ -1,25 +1,34 @@
 package com.tazmans_android.gpstrackerandroid.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import com.tazmans_android.gpstrackerandroid.databinding.SettingsBinding
+import androidx.preference.Preference
+import androidx.preference.Preference.OnPreferenceChangeListener
+import androidx.preference.PreferenceFragmentCompat
+import com.tazmans_android.gpstrackerandroid.R
+import com.tazmans_android.gpstrackerandroid.utils.showToast
 
-class SettingsFragment : Fragment() {
-    private lateinit var binding: SettingsBinding
+class SettingsFragment : PreferenceFragmentCompat() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = SettingsBinding.inflate(inflater, container, false)
-        return binding.root
+    private lateinit var timePref: Preference
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.main_preference, rootKey)
+        init()
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = SettingsFragment()
+    private fun init() {
+        timePref = findPreference("update_time_key")!!
+        val changeListener = onChangeListener()
+        timePref.onPreferenceChangeListener = changeListener
+    }
+
+    private fun onChangeListener(): Preference.OnPreferenceChangeListener {
+        return Preference.OnPreferenceChangeListener { pref, value ->
+            val nameArray = resources.getStringArray(R.array.loc_time_update_name)
+            val valueArray = resources.getStringArray(R.array.loc_time_update_value)
+            val title = pref.title.toString().substringBefore(":")
+            pref.title = "$title: ${nameArray[valueArray.indexOf(value)]}"
+            true
+        }
     }
 }
